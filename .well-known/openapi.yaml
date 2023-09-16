@@ -39,7 +39,8 @@ components:
       type: object
       properties:
         source:
-          $ref: "#/components/schemas/Source"
+        title: Source
+          type: string
         source_id:
           title: Source Id
           type: string
@@ -87,7 +88,8 @@ components:
           title: Document Id
           type: string
         source:
-          $ref: "#/components/schemas/Source"
+          title: Source
+          type: string
         source_id:
           title: Source Id
           type: string
@@ -161,14 +163,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DocumentChunkWithScore"
-    Source:
-      title: Source
-      enum:
-        - email
-        - file
-        - chat
-      type: string
-      description: An enumeration.
     ValidationError:
       title: ValidationError
       required:
