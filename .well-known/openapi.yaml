@@ -39,7 +39,7 @@ components:
       type: object
       properties:
         source:
-        title: Source
+          title: Source
           type: string
         source_id:
           title: Source Id
