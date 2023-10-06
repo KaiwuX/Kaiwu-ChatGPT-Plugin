@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
-  title: Retrieval Plugin API
-  description: A retrieval API for querying and filtering documents based on natural language queries and metadata
+  title: TianGong Plugin API
+  description: A retrieval API for querying with optional filters in academic papers and professional documents
   version: 1.0.0
   servers:
     - url: http://localhost:3333
@@ -9,7 +9,8 @@ paths:
   /query:
     post:
       summary: Query
-      description: Accepts search query objects array each with query and optional filter. Break down complex questions into sub-questions. Refine results by criteria, e.g. time / source, don't do this often. Split queries if ResponseTooLargeError occurs.
+      description: |
+        Accepts search query objects array each with query and optional filters, in format: {"queries": [{"query":"string","filter":{"source":"string","start_date":"string","end_date":"string"},"top_k":16}]}. Break down complex questions into sub-questions. Split queries if ResponseTooLargeError occurs.
       operationId: query_query_post
       requestBody:
         content:
@@ -123,7 +124,7 @@ components:
         top_k:
           title: Top K
           type: integer
-          default: 3
+          default: 16
     QueryRequest:
       title: QueryRequest
       required:

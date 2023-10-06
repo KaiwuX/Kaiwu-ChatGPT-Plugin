@@ -120,6 +120,13 @@ class PineconeDataStore(DataStore):
         async def _single_query(query: QueryWithEmbedding) -> QueryResult:
             logger.debug(f"Query: {query.query}")
 
+            # Convert the source to uppercase
+            if (
+                query.filter
+                and query.filter.source
+            ):
+                query.filter.source = query.filter.source.upper()
+
             # Convert the metadata filter object to a dict with pinecone filter expressions
             pinecone_filter = self._get_pinecone_filter(query.filter)
 
@@ -148,12 +155,12 @@ class PineconeDataStore(DataStore):
                 )
 
                 # If the source is not a valid Source in the Source enum, set it to None
-                if (
-                    metadata_without_text
-                    and "source" in metadata_without_text
-                    and metadata_without_text["source"] not in Source.__members__
-                ):
-                    metadata_without_text["source"] = None
+                # if (
+                #     metadata_without_text
+                #     and "source" in metadata_without_text
+                #     and metadata_without_text["source"] not in Source.__members__
+                # ):
+                #     metadata_without_text["source"] = None
 
                 # Create a document chunk with score object with the result data
                 result = DocumentChunkWithScore(
@@ -232,11 +239,11 @@ class PineconeDataStore(DataStore):
         for field, value in filter.dict().items():
             if value is not None:
                 if field == "start_date":
-                    pinecone_filter["date"] = pinecone_filter.get("date", {})
-                    pinecone_filter["date"]["$gte"] = to_unix_timestamp(value)
+                    pinecone_filter["created_at"] = pinecone_filter.get("created_at", {})
+                    pinecone_filter["created_at"]["$gte"] = to_unix_timestamp(value)
                 elif field == "end_date":
-                    pinecone_filter["date"] = pinecone_filter.get("date", {})
-                    pinecone_filter["date"]["$lte"] = to_unix_timestamp(value)
+                    pinecone_filter["created_at"] = pinecone_filter.get("created_at", {})
+                    pinecone_filter["created_at"]["$lte"] = to_unix_timestamp(value)
                 else:
                     pinecone_filter[field] = value
 

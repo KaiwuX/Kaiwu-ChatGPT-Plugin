@@ -125,7 +125,7 @@ components:
         top_k:
           title: Top K
           type: integer
-          default: 3
+          default: 16
     QueryRequest:
       title: QueryRequest
       required:
