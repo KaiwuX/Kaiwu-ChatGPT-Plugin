@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
-  title: TianGong Plugin API
-  description: A retrieval API for querying and filtering academic papers and professional documents based on natural language queries and metadata
+  title: TianGong
+  description: For querying academic papers and professional documents with optional filters.
   version: 1.0.0
   servers:
     - url: https://your-app-url.com
