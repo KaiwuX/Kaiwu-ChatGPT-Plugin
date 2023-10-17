@@ -27,7 +27,7 @@ share/python-wheels/
 MANIFEST
 
 # .vscode files
-.vscode/*
+# .vscode/*
 
 # Pycharm
 .idea/
