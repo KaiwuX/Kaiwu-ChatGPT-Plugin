@@ -127,18 +127,3 @@ async def wix_get_subscription(member_access_token: str) -> str:
     subscription = get_highest_active_subscription(orders)
 
     return subscription
-
-
-async def chatgpt_redirect(redirect_uri: str) -> str:
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            redirect_uri,
-            headers={"Authorization": "Bearer api_0rUJWkqjJXaZgXcZqXQwKXrXQZQ"},
-            json={
-                "access_token": os.environ["BEARER_TOKEN"],
-                "token_type": "bearer",
-                "refresh_token": os.environ["REFRESH_TOKEN"],
-                "expires_in": 59,
-            },
-        )
-    return response.json()[0]["generated_text"]
