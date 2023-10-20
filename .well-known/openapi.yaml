@@ -4,7 +4,7 @@ info:
   description: For querying academic papers and professional documents with optional filters.
   version: 1.0.0
   servers:
-    - url: https://your-app-url.com
+    - url: https://plugin.tiangong.world
 paths:
   /query:
     post:

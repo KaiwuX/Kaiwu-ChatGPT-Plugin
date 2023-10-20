@@ -73,6 +73,7 @@ Follow these steps to quickly set up and run the ChatGPT Retrieval Plugin:
 6. Activate the virtual environment: `poetry shell`
 7. Install python dev environment: `pip install --upgrade setuptools wheel` and `sudo apt-get install libpq-dev python3-dev`
 8. Install app dependencies: `poetry install`
+9. Find the poetry env path: `poetry env info --path`
 9. Create a [bearer token](#general-environment-variables)
 10. Set the required environment variables:
 

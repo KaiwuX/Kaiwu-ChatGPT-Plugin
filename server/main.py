@@ -1,11 +1,28 @@
 import os
 from typing import Optional
-import uvicorn
-from fastapi import FastAPI, File, Form, HTTPException, Depends, Body, UploadFile
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.staticfiles import StaticFiles
-from loguru import logger
 
+import uvicorn
+from fastapi import (
+    Body,
+    Depends,
+    FastAPI,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    Request,
+    UploadFile,
+    status,
+)
+from fastapi.responses import JSONResponse
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from loguru import logger
+from pydantic import BaseModel
+from starlette.middleware.sessions import SessionMiddleware
+
+from datastore.factory import get_datastore
 from models.api import (
     DeleteRequest,
     DeleteResponse,
@@ -14,10 +31,13 @@ from models.api import (
     UpsertRequest,
     UpsertResponse,
 )
-from datastore.factory import get_datastore
-from services.file import get_document_from_file
-
 from models.models import DocumentMetadata, Source
+from services.file import get_document_from_file
+from services.wix_oauth import (
+    get_member_access_token,
+    wix_get_callback_url,
+    wix_get_subscription,
+)
 
 bearer_scheme = HTTPBearer()
 BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
@@ -32,6 +52,134 @@ def validate_token(credentials: HTTPAuthorizationCredentials = Depends(bearer_sc
 
 app = FastAPI(dependencies=[Depends(validate_token)])
 app.mount("/.well-known", StaticFiles(directory=".well-known"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+oauth_app = FastAPI()
+templates = Jinja2Templates(directory="templates")
+oauth_app.add_middleware(SessionMiddleware, secret_key="your-secret-key")
+
+
+def get_oauth_params(
+    response_type: str = Query(...),
+    client_id: str = Query(...),
+    scope: str = Query(...),
+    state: str = Query(...),
+    redirect_uri: str = Query(...),
+) -> dict:
+    return {
+        "response_type": response_type,
+        "client_id": client_id,
+        "scope": scope,
+        "state": state,
+        "redirect_uri": redirect_uri,
+    }
+
+
+async def get_session_data(request: Request):
+    return request.session
+
+
+@oauth_app.get("/login/")
+async def login(
+    request: Request,
+    oauth_params: dict = Depends(get_oauth_params),
+    session_data: dict = Depends(get_session_data),
+):
+    session_data.update(oauth_params)
+    return templates.TemplateResponse("login.html", {"request": request})
+
+
+@oauth_app.post("/login/")
+async def login_post(
+    username: str = Form(...),
+    password: str = Form(...),
+    session_data: dict = Depends(get_session_data),
+):
+    response_type = session_data.get("response_type")
+    client_id = session_data.get("client_id")
+    scope = session_data.get("scope")
+    state = session_data.get("state")
+    redirect_uri = session_data.get("redirect_uri")
+
+    wix_callback_url, code_verifier = await wix_get_callback_url(
+        username=username, password=password, state=state
+    )
+
+    session_data["wix_callback_url"] = wix_callback_url
+    session_data["code_verifier"] = code_verifier
+
+    # 重定向到 callback 路由
+    url = f"../callback/"
+    raise HTTPException(
+        status_code=status.HTTP_303_SEE_OTHER, headers={"Location": url}
+    )
+
+
+@oauth_app.get("/callback/")
+async def callback(request: Request, session_data: dict = Depends(get_session_data)):
+    wix_callback_url = session_data.get("wix_callback_url")
+
+    return templates.TemplateResponse(
+        "callback.html",
+        {
+            "request": request,
+            "wix_callback_url": wix_callback_url,
+        },
+    )
+
+
+class SubscriptionRequest(BaseModel):
+    code: str
+    state: str
+
+
+@oauth_app.post("/callback/")
+async def subscription(
+    request: SubscriptionRequest, session_data: dict = Depends(get_session_data)
+):
+    # 从 session 中获取变量
+    response_type = session_data.get("response_type")
+    client_id = session_data.get("client_id")
+    scope = session_data.get("scope")
+    state = session_data.get("state")
+    redirect_uri = session_data.get("redirect_uri")
+    url = redirect_uri + "?state=" + state
+
+    # 处理请求
+    code = request.code
+    member_access_token, member_refresh_token = await get_member_access_token(
+        code, session_data["code_verifier"]
+    )
+
+    subscription = await wix_get_subscription(member_access_token)
+
+    if subscription == "Elite":
+        return JSONResponse(content={"message": "You are an Elite member.", "url": url})
+
+    else:
+        return JSONResponse(
+            content={
+                "message": "You are not an Elite member.",
+                "url": "https://www.kaiwu.info",
+            }
+        )
+
+
+@oauth_app.post("/authorization/")
+async def authorization(
+    client_id: str = Form(...),
+    client_secret: str = Form(...),
+):
+    if client_id != os.environ.get("CLIENT_ID") or client_secret != os.environ.get(
+        "CLIENT_SECRET"
+    ):
+        raise HTTPException(status_code=401, detail="Invalid or missing token")
+
+    return {"access_token": os.environ.get("BEARER_TOKEN"), "token_type": "bearer"}
+
+
+app.mount("/oauth", oauth_app)
 
 # Create a sub-application, in order to access just the query endpoint in an OpenAPI schema, found at http://0.0.0.0:8000/sub/openapi.json when the app is running locally
 sub_app = FastAPI(
