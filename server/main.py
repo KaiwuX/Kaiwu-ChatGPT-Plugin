@@ -52,7 +52,6 @@ def validate_token(credentials: HTTPAuthorizationCredentials = Depends(bearer_sc
 
 app = FastAPI(dependencies=[Depends(validate_token)])
 app.mount("/.well-known", StaticFiles(directory=".well-known"), name="static")
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 oauth_app = FastAPI()
