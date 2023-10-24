@@ -96,11 +96,11 @@ async def login_post(
     password: str = Form(...),
     session_data: dict = Depends(get_session_data),
 ):
-    response_type = session_data.get("response_type")
-    client_id = session_data.get("client_id")
-    scope = session_data.get("scope")
+    # response_type = session_data.get("response_type")
+    # client_id = session_data.get("client_id")
+    # scope = session_data.get("scope")
     state = session_data.get("state")
-    redirect_uri = session_data.get("redirect_uri")
+    # redirect_uri = session_data.get("redirect_uri")
 
     wix_callback_url, code_verifier = await wix_get_callback_url(
         username=username, password=password, state=state
@@ -109,7 +109,7 @@ async def login_post(
     session_data["wix_callback_url"] = wix_callback_url
     session_data["code_verifier"] = code_verifier
 
-    # 重定向到 callback 路由
+    # redirect to callback url
     url = f"../callback/"
     raise HTTPException(
         status_code=status.HTTP_303_SEE_OTHER, headers={"Location": url}
@@ -138,18 +138,19 @@ class SubscriptionRequest(BaseModel):
 async def subscription(
     request: SubscriptionRequest, session_data: dict = Depends(get_session_data)
 ):
-    # 从 session 中获取变量
-    response_type = session_data.get("response_type")
-    client_id = session_data.get("client_id")
-    scope = session_data.get("scope")
+    # response_type = session_data.get("response_type")
+    # client_id = session_data.get("client_id")
+    # scope = session_data.get("scope")
     state = session_data.get("state")
     redirect_uri = session_data.get("redirect_uri")
-    url = redirect_uri + "?state=" + state
+    # state from wix
+    openai_code = os.environ.get("OPENAI_CODE")
+    url = redirect_uri + f"?state={state}&code={openai_code}"
 
-    # 处理请求
-    code = request.code
+    wix_code = request.code
+
     member_access_token, member_refresh_token = await get_member_access_token(
-        code, session_data["code_verifier"]
+        wix_code, session_data["code_verifier"]
     )
 
     subscription = await wix_get_subscription(member_access_token)
@@ -170,9 +171,12 @@ async def subscription(
 async def authorization(
     client_id: str = Form(...),
     client_secret: str = Form(...),
+    code: str = Form(...),
 ):
-    if client_id != os.environ.get("CLIENT_ID") or client_secret != os.environ.get(
-        "CLIENT_SECRET"
+    if (
+        client_id != os.environ.get("CLIENT_ID")
+        or client_secret != os.environ.get("CLIENT_SECRET")
+        or code != os.environ.get("OPENAI_CODE")
     ):
         raise HTTPException(status_code=401, detail="Invalid or missing token")
 
