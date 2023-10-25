@@ -19,7 +19,7 @@
     "url": "https://plugin.kaiwu.tech/.well-known/openapi.yaml",
     "has_user_authentication": false
   },
-  "logo_url": "https://plugin.kaiwu.techp/.well-known/logo.png",
+  "logo_url": "https://plugin.kaiwu.tech/.well-known/logo.png",
   "contact_email": "kaiwu_info@proton.me", 
   "legal_info_url": "https://plugin.kaiwu.tech/legal-info"
 }
