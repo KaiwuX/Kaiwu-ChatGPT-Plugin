@@ -1,13 +1,13 @@
 {
   "schema_version": "v1",
-  "name_for_model": "TianGong",
-  "name_for_human": "TianGong",
+  "name_for_model": "Kaiwu",
+  "name_for_human": "Kaiwu",
   "description_for_model": "For searching through academic papers and professional documents to find relevant information.",
   "description_for_human": "Search through academic papers and professional documents.",
   "auth" : {
     "type":"oauth",
-    "client_url":"https://plugin.tiangong.world/oauth/login",
-    "authorization_url":"https://plugin.tiangong.world/oauth/authorization",
+    "client_url":"https://plugin.kaiwu.tech/oauth/login",
+    "authorization_url":"https://plugin.kaiwu.tech/oauth/authorization",
     "scope":"search:read",
     "authorization_content_type":"application/x-www-form-urlencoded",
     "verification_tokens":{
@@ -16,10 +16,10 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://plugin.tiangong.world/.well-known/openapi.yaml",
+    "url": "https://plugin.kaiwu.tech/.well-known/openapi.yaml",
     "has_user_authentication": false
   },
-  "logo_url": "https://plugin.tiangong.world/.well-known/logo.png",
-  "contact_email": "hello@contact.com", 
-  "legal_info_url": "http://plugin.tiangong.world/legal-info"
+  "logo_url": "https://plugin.kaiwu.techp/.well-known/logo.png",
+  "contact_email": "kaiwu_info@proton.me", 
+  "legal_info_url": "https://plugin.kaiwu.tech/legal-info"
 }
