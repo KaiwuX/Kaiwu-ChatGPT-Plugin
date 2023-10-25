@@ -9,3 +9,4 @@ local_server/
 *.pyc
 .dockerignore
 Dockerfile
+.env
