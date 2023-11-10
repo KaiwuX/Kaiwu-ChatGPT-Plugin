@@ -1,7 +1,7 @@
 {
   "schema_version": "v1",
-  "name_for_model": "TianGong",
-  "name_for_human": "TianGong Plugin",
+  "name_for_model": "Kaiwu",
+  "name_for_human": "Kaiwu GPT",
   "description_for_model": "Plugin for searching through academic papers and professional documents to find answers to questions and retrieve relevant information.",
   "description_for_human": "Search through academic papers and professional documents.",
     "auth": {

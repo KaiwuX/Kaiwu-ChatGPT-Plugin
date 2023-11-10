@@ -1,6 +1,6 @@
 openapi: 3.0.2
 info:
-  title: TianGong Plugin API
+  title: Kaiwu GPT API
   description: A retrieval API for querying with optional filters in academic papers and professional documents
   version: 1.0.0
   servers:
