@@ -10,6 +10,7 @@ Provide accurate and personalized retrieval results.
 Improve the Action and develop new features.
 Monitor and analyze usage trends and preferences.
 Comply with any applicable laws and regulations.
+
 3. Data Sharing and Disclosure
 We do not sell, trade, or rent Users' personal identification information to others. We may share generic aggregated demographic information not linked to any personal identification information regarding visitors and users with our business partners, trusted affiliates, and advertisers for the purposes outlined above.
 
