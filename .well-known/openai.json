@@ -33,7 +33,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/QueryResponse"
+                                    "$ref": "#/components/schemas/QueryResponseNeat"
                                 }
                             }
                         }
@@ -89,32 +89,22 @@
                     }
                 }
             },
-            "DocumentChunkWithScore": {
-                "title": "DocumentChunkWithScore",
+            "DocumentChunkWithScoreNeat": {
+                "title": "DocumentChunkWithScoreNeat",
                 "required": [
                     "text",
-                    "metadata",
+                    "source",
                     "score"
                 ],
                 "type": "object",
                 "properties": {
-                    "id": {
-                        "title": "Id",
-                        "type": "string"
-                    },
                     "text": {
                         "title": "Text",
                         "type": "string"
                     },
-                    "metadata": {
-                        "$ref": "#/components/schemas/DocumentChunkMetadata"
-                    },
-                    "embedding": {
-                        "title": "Embedding",
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
+                    "source": {
+                        "title": "Source",
+                        "type": "string"
                     },
                     "score": {
                         "title": "Score",
@@ -202,8 +192,8 @@
                     }
                 }
             },
-            "QueryResponse": {
-                "title": "QueryResponse",
+            "QueryResponseNeat": {
+                "title": "QueryResponseNeat",
                 "required": [
                     "results"
                 ],
@@ -213,28 +203,23 @@
                         "title": "Results",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/QueryResult"
+                            "$ref": "#/components/schemas/QueryResultNeat"
                         }
                     }
                 }
             },
-            "QueryResult": {
-                "title": "QueryResult",
+            "QueryResultNeat": {
+                "title": "QueryResultNeat",
                 "required": [
-                    "query",
                     "results"
                 ],
                 "type": "object",
                 "properties": {
-                    "query": {
-                        "title": "Query",
-                        "type": "string"
-                    },
                     "results": {
                         "title": "Results",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/DocumentChunkWithScore"
+                            "$ref": "#/components/schemas/DocumentChunkWithScoreNeat"
                         }
                     }
                 }
