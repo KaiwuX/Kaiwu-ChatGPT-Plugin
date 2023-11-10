@@ -11,6 +11,7 @@ paths:
       summary: Query
       description: Accepts search query objects array each with query and optional filter. Break down complex questions into sub-questions. Refine results by criteria, e.g. time / source, don't do this often. Split queries if ResponseTooLargeError occurs.
       operationId: query_query_post
+      x-openai-isConsequential: false
       requestBody:
         content:
           application/json:
