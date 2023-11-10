@@ -3,6 +3,7 @@ from models.models import (
     DocumentMetadataFilter,
     Query,
     QueryResult,
+    QueryResultNeat,
 )
 from pydantic import BaseModel
 from typing import List, Optional
@@ -22,6 +23,10 @@ class QueryRequest(BaseModel):
 
 class QueryResponse(BaseModel):
     results: List[QueryResult]
+
+
+class QueryResponseNeat(BaseModel):
+    results: List[QueryResultNeat]
 
 
 class DeleteRequest(BaseModel):

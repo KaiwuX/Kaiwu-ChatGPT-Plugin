@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import Optional
 
 import uvicorn
@@ -28,10 +29,16 @@ from models.api import (
     DeleteResponse,
     QueryRequest,
     QueryResponse,
+    QueryResponseNeat,
     UpsertRequest,
     UpsertResponse,
 )
-from models.models import DocumentMetadata, Source
+from models.models import (
+    DocumentChunkWithScoreNeat,
+    DocumentMetadata,
+    QueryResultNeat,
+    Source,
+)
 from services.file import get_document_from_file
 from services.wix_oauth import (
     get_member_access_token,
@@ -239,7 +246,7 @@ async def upsert(
 
 @app.post(
     "/query",
-    response_model=QueryResponse,
+    response_model=QueryResponseNeat,
 )
 async def query_main(
     request: QueryRequest = Body(...),
@@ -248,7 +255,29 @@ async def query_main(
         results = await datastore.query(
             request.queries,
         )
-        return QueryResponse(results=results)
+        query_response_neat = QueryResponseNeat(results=[])
+        for items in results:
+            query_result_neat = QueryResultNeat(results=[])
+            for result in items.results:
+                text = result.text
+                metadata = result.metadata
+                date = datetime.fromtimestamp(float(metadata.created_at))
+                formatted_date = date.strftime("%Y-%m")
+                source_entry = "[{}. {}. {}. {}.]({})".format(
+                    metadata.source_id,
+                    metadata.source,
+                    metadata.author,
+                    formatted_date,
+                    metadata.url,
+                )
+                document_chunk_with_score_neat = DocumentChunkWithScoreNeat(
+                    text=text,
+                    source=source_entry,
+                    score=result.score,
+                )
+                query_result_neat.results.append(document_chunk_with_score_neat)
+            query_response_neat.results.append(query_result_neat)
+        return query_response_neat
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500, detail="Internal Service Error")
@@ -256,7 +285,7 @@ async def query_main(
 
 @sub_app.post(
     "/query",
-    response_model=QueryResponse,
+    response_model=QueryResponseNeat,
     # NOTE: We are describing the shape of the API endpoint input due to a current limitation in parsing arrays of objects from OpenAPI schemas. This will not be necessary in the future.
     description="Accepts search query objects array each with query and optional filter. Break down complex questions into sub-questions. Refine results by criteria, e.g. time / source, don't do this often. Split queries if ResponseTooLargeError occurs.",
 )
