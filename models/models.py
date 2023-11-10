@@ -28,7 +28,16 @@ class DocumentChunk(BaseModel):
     embedding: Optional[List[float]] = None
 
 
+class DocumentChunkNeat(BaseModel):
+    text: str
+    source: str
+
+
 class DocumentChunkWithScore(DocumentChunk):
+    score: float
+
+
+class DocumentChunkWithScoreNeat(DocumentChunkNeat):
     score: float
 
 
@@ -64,3 +73,7 @@ class QueryWithEmbedding(Query):
 class QueryResult(BaseModel):
     query: str
     results: List[DocumentChunkWithScore]
+
+
+class QueryResultNeat(BaseModel):
+    results: List[DocumentChunkWithScoreNeat]
